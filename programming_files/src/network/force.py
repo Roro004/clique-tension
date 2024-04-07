@@ -1,10 +1,13 @@
 import numpy as np
 from network.visuals import plot_graph
 import matplotlib.pyplot as plt
+from network.identify import map_nodes_to_cliques
 
 
 def initialize_positions(G):
     return {i: np.random.rand(2) for i in G.nodes()}
+
+
 
 def apply_forces(G, pos, repulsion=4000, attraction=0.1, max_displacement=10, acceleration_factor=1.2):
     displacement = {i: np.zeros(2) for i in G.nodes()}
@@ -37,11 +40,12 @@ def apply_forces(G, pos, repulsion=4000, attraction=0.1, max_displacement=10, ac
 
     for i in repulse_count:
         if repulse_count[i] > 2:
-            # Apply acceleration in opposite direction to attractive forces
-            # Only if there are attractive forces acting on the node
+        # Only proceed if attractive forces exist
             for _, vector in force_vectors['attractive'].get((i, i), []):
-                displacement[i] -= vector * acceleration_factor
-
+            # Apply acceleration in the opposite direction only if nodes are in different cliques
+                for j in repulse_count:
+                    if j != i and map_nodes_to_cliques.get(i) != map_nodes_to_cliques.get(j):
+                        displacement[i] -= vector * acceleration_factor
     return displacement, force_vectors
 
 def update_positions(pos, displacement, cooling_factor=0.1):
