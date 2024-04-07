@@ -2,25 +2,25 @@ import networkx as nx
 
 def create_graph():
     # 1: Karate
-    # G = nx.karate_club_graph()
+    G = nx.karate_club_graph()
 
-    G = nx.Graph()
-    # 2: 89 nodes
-    file_path = 'programming_files/src/data/email_eu_3_89'
-    # 3: 142 nodes
-    file_path = 'programming_files/src/data/email_eu_4_142'
-    # 4: 162 nodes
-    file_path = 'programming_files/src/data/email_eu_4_162.txt'
-    # 5: 309 nodes
-    file_path = 'programming_files/src/data/email_eu_1_309'
-    # 6: 986 nodes
-    file_path = 'programming_files/src/data/986'
+    # G = nx.Graph()
+    # # 2: 89 nodes
+    # file_path = 'programming_files/src/data/email_eu_3_89'
+    # # 3: 142 nodes
+    # file_path = 'programming_files/src/data/email_eu_4_142'
+    # # 4: 162 nodes
+    # file_path = 'programming_files/src/data/email_eu_4_162.txt'
+    # # 5: 309 nodes
+    # file_path = 'programming_files/src/data/email_eu_1_309'
+    # # 6: 986 nodes
+    # file_path = 'programming_files/src/data/986'
 
     # Read the edges from the file and add them to the graph
-    with open(file_path, 'r') as file:
-        for line in file:
-            node1, node2, _ = line.strip().split()
-            G.add_edge(int(node1), int(node2))
+    # with open(file_path, 'r') as file:
+    #     for line in file:
+    #         node1, node2, _ = line.strip().split()
+    #         G.add_edge(int(node1), int(node2))
 
 
 # file_path = 'programming_files/src/data/edges'  # Adjust the path if your file is located elsewhere
