@@ -2,6 +2,8 @@ import numpy as np
 from network.visuals import plot_graph
 import matplotlib.pyplot as plt
 from network.identify import map_nodes_to_cliques
+import random
+import math
 
 
 def initialize_positions(G):
@@ -14,75 +16,147 @@ def apply_forces(G, pos, repulsion=4000, attraction=0.1, max_displacement=10, ac
     force_vectors = {'attractive': {}, 'repulsive': {}}
     repulse_count = {i: 0 for i in G.nodes()}  # Count of repulsive forces for each node
 
+    for index, clique in enumerate(cliques):
+        # Ensure 'clique' is iterable. If 'clique' is a single integer, convert it to a list.
+        if isinstance(clique, int):
+            clique = [clique]  # Convert to a list containing the integer
+
+        # Now, 'clique' is guaranteed to be iterable
+        for node in clique:
+
     # Apply repulsive forces
-    for i in G.nodes():
-        for j in G.nodes():
-            if i != j:
+            for i in G.nodes():
+                for j in G.nodes():
+                    if i != j:
+                        delta = pos[i] - pos[j]
+                        distance = np.linalg.norm(delta) + 0.01
+                        force_magnitude = min(repulsion / distance**2, max_displacement)
+                        force_vector = delta / distance * force_magnitude
+                        displacement[i] += force_vector
+                        if i not in force_vectors['repulsive']:
+                            force_vectors['repulsive'][i] = []
+                        force_vectors['repulsive'][i].append((j, force_vector))
+
+            # Apply attractive forces
+            for i, j in G.edges():
                 delta = pos[i] - pos[j]
-                distance = np.linalg.norm(delta) + 0.01
-                force_magnitude = min(repulsion / distance**2, max_displacement)
-                force_vector = delta / distance * force_magnitude
-                displacement[i] += force_vector
-                if i not in force_vectors['repulsive']:
-                    force_vectors['repulsive'][i] = []
-                force_vectors['repulsive'][i].append((j, force_vector))
+                distance = np.linalg.norm(delta)
+                force_magnitude = min(distance**2 / attraction, max_displacement)
+                direction = delta / distance
+                force_vector = direction * force_magnitude
+                displacement[i] -= force_vector
+                displacement[j] += force_vector
+                force_vectors['attractive'][(i, j)] = force_vector
 
-    # Apply attractive forces
-    for i, j in G.edges():
-        delta = pos[i] - pos[j]
-        distance = np.linalg.norm(delta)
-        force_magnitude = min(distance**2 / attraction, max_displacement)
-        direction = delta / distance
-        force_vector = direction * force_magnitude
-        displacement[i] -= force_vector
-        displacement[j] += force_vector
-        force_vectors['attractive'][(i, j)] = force_vector
-
-    # for i in repulse_count:
-    #     if repulse_count[i] > 2:
-    #     # Only proceed if attractive forces exist
-    #         for _, vector in force_vectors['attractive'].get((i, i), []):
-    #         # Apply acceleration in the opposite direction only if nodes are in different cliques
-    #             for j in repulse_count:
-    #                 if j != i and map_nodes_to_cliques.get(i) != map_nodes_to_cliques.get(j):
-    #                     displacement[i] -= vector * acceleration_factor
-    # return displacement, force_vectors
+            # for i in repulse_count:
+            #     if repulse_count[i] > 2:
+            #     # Only proceed if attractive forces exist
+            #         for _, vector in force_vectors['attractive'].get((i, i), []):
+            #         # Apply acceleration in the opposite direction only if nodes are in different cliques
+            #             for j in repulse_count:
+            #                 if j != i and map_nodes_to_cliques.get(i) != map_nodes_to_cliques.get(j):
+            #                     displacement[i] -= vector * acceleration_factor
+            # return displacement, force_vectors
 
 
 
-    # Assuming 'map_nodes_to_cliques' is a dict mapping node to its clique index
-    cliques = list(set(map_nodes_to_cliques(G)))
-    num_cliques = len(cliques)
+            # Assuming 'map_nodes_to_cliques' is a dict mapping node to its clique index
 
-    # Assuming the desired range for x positions is between 0 and 1
-    # Calculate equidistant x positions for each clique
-    x_positions = {clique: (index + 1) / (num_cliques + 1) for index, clique in enumerate(cliques)}
+            # num_cliques = len(cliques)
 
-    for i in repulse_count:
-        if repulse_count[i] > 2:
-            # Attract nodes to their clique's x-axis position
-            clique_of_i = map_nodes_to_cliques.get(i)
-            if clique_of_i is not None:
-                target_x_position = x_positions[clique_of_i]
+            # # Assuming the desired range for x positions is between 0 and 1
+            # # Calculate equidistant x positions for each clique
+            # x_positions = {clique: (index + 1) / (num_cliques + 1) for index, clique in enumerate(cliques)}
 
-                # Assuming 'displacement' is a dict with node keys and (x, y) tuple values
-                current_x, current_y = displacement[i]
+            # for i in repulse_count:
+            #     if repulse_count[i] > 2:
+            #         # Attract nodes to their clique's x-axis position
+            #         clique_of_i = map_nodes_to_cliques.get(i)
+            #         if clique_of_i is not None:
+            #             target_x_position = x_positions[clique_of_i]
 
-                # Calculate the x-axis displacement needed to move towards the target x position
-                # Adjust this calculation based on your specific needs (e.g., current position, fixed acceleration factor)
-                x_displacement = (target_x_position - current_x) * acceleration_factor
+            #             # Assuming 'displacement' is a dict with node keys and (x, y) tuple values
+            #             current_x, current_y = displacement[i]
 
-                # Update the displacement with the new x value, leaving y as it is
-                displacement[i] = (current_x + x_displacement, current_y)
+            #             # Calculate the x-axis displacement needed to move towards the target x position
+            #             # Adjust this calculation based on your specific needs (e.g., current position, fixed acceleration factor)
+            #             x_displacement = (target_x_position - current_x) * acceleration_factor
 
-                # If there are attractive forces, apply them as well
-                for _, vector in force_vectors['attractive'].get((i, i), []):
-                    for j in repulse_count:
-                        if j != i and map_nodes_to_cliques.get(i) != map_nodes_to_cliques.get(j):
-                            # Modify the x component of the vector only, as y is not fixed
-                            displacement[i] = (displacement[i][0] - vector[0] * acceleration_factor, displacement[i][1])
+            #             # Update the displacement with the new x value, leaving y as it is
+            #             displacement[i] = (current_x + x_displacement, current_y)
 
-    return displacement, force_vectors
+            #             # If there are attractive forces, apply them as well
+            #             for _, vector in force_vectors['attractive'].get((i, i), []):
+            #                 for j in repulse_count:
+            #                     if j != i and map_nodes_to_cliques.get(i) != map_nodes_to_cliques.get(j):
+            #                         # Modify the x component of the vector only, as y is not fixed
+            #                         displacement[i] = (displacement[i][0] - vector[0] * acceleration_factor, displacement[i][1])
+
+
+            # nodes_in_cliques = set(node for clique in cliques for node in clique)
+
+            # # Decide a random axis for the force to be applied to all nodes
+            # force_axis = random.choice(['x', 'y'])
+
+            # for node in nodes_in_cliques:
+            #     current_x, current_y = displacement[node]
+
+            #     if force_axis == 'x':
+            #         # Apply force along the x-axis
+            #         x_displacement = acceleration_factor  # Assuming a positive direction for simplicity
+            #         displacement[node] = (current_x + x_displacement, current_y)
+            #     else:
+            #         # Apply force along the y-axis
+            #         y_displacement = acceleration_factor  # Assuming a positive direction for simplicity
+            #         displacement[node] = (current_x, current_y + y_displacement)
+
+
+
+            # for index, clique in enumerate(cliques):
+            #         force_axis = 'x' if index % 2 == 0 else 'y'
+
+            #         for node in clique:
+            #             current_x, current_y = displacement[node]
+
+            #             if force_axis == 'x':
+            #                 # Apply force along the x-axis
+            #                 x_displacement = acceleration_factor  # Adjust this for direction and magnitude
+            #                 displacement[node] = (current_x + x_displacement, current_y)
+            #             else:
+            #                 # Apply force along the y-axis
+            #                 y_displacement = acceleration_factor  # Adjust this for direction and magnitude
+            #                 displacement[node] = (current_x, current_y + y_displacement)
+
+
+
+            cliques = list(set(map_nodes_to_cliques(G)))
+            num_cliques = len(cliques)
+            angle_increment = 360 / num_cliques  # Divide the circle into equal parts based on the number of cliques
+
+            for index, clique in enumerate(cliques):
+                # Calculate the angle for this clique
+                angle_degrees = index * angle_increment
+                angle_radians = math.radians(angle_degrees)
+
+                # Calculate the direction vector for this angle
+                direction_x = math.cos(angle_radians)
+                direction_y = math.sin(angle_radians)
+
+                # Apply the force to each node in the clique
+                for node in clique:
+                    current_x, current_y = displacement[node]
+
+                    # Calculate the new displacement
+                    new_x = current_x + direction_x * force_magnitude
+                    new_y = current_y + direction_y * force_magnitude
+
+                    displacement[node] = (new_x, new_y)
+
+
+
+
+
+            return displacement, force_vectors
 
 
 
