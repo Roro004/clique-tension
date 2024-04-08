@@ -1,9 +1,18 @@
 import matplotlib.pyplot as plt
 import networkx as nx
-
+from network.identify import find_max_cliques
 def plot_graph(G, pos, old_pos, force_vectors, ax):
     ax.clear()
+    cliques = find_max_cliques(G)
     nx.draw(G, pos, ax=ax, node_color='skyblue', edge_color='gray', node_size=50)
+    for clique in cliques:
+        for i in range(len(clique)):
+            for j in range(i + 1, len(clique)):
+                if G.has_edge(clique[i], clique[j]):
+                    # Draw edge in green
+                    ax.plot([pos[clique[i]][0], pos[clique[j]][0]],
+                            [pos[clique[i]][1], pos[clique[j]][1]],
+                            color='green', linewidth=2, alpha=0.6)
 
     # Draw movement lines
     for i in pos.keys():
