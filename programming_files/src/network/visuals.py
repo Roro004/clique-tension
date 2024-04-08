@@ -1,22 +1,27 @@
 import matplotlib.pyplot as plt
 import networkx as nx
 from network.identify import find_max_cliques
-def plot_graph(G, pos, old_pos, force_vectors, ax):
+def plot_graph(G, pos, old_pos, force_vectors, cliques, ax):
     ax.clear()
-    colormap = plt.cm.get_cmap('viridis', len(cliques))
-    cliques = find_max_cliques(G)
-    nx.draw(G, pos, ax=ax, node_color='skyblue', edge_color='gray', node_size=50)
-    for clique in cliques:
-        for idx, clique in enumerate(cliques):
-        # Map the index of each clique to a color in the colormap
-            clique_color = colormap(idx)
-            for i in range(len(clique)):
-                for j in range(i + 1, len(clique)):
-                    if G.has_edge(clique[i], clique[j]):
-                        # Draw edge in green
-                        ax.plot([pos[clique[i]][0], pos[clique[j]][0]],
-                                [pos[clique[i]][1], pos[clique[j]][1]],
-                                color=clique_color, linewidth=2, alpha=0.6)
+
+    # Get a colormap from matplotlib, dynamically adjusting to the number of cliques
+    colormap = plt.cm.get_cmap('Pastel2_r', len(cliques))
+
+    # Highlight edges within each clique using colors from the colormap
+    for idx, clique in enumerate(cliques):
+        clique_color = colormap(idx / len(cliques))  # Normalize idx to the range [0, 1]
+
+        for i in range(len(clique)):
+            for j in range(i + 1, len(clique)):
+                if G.has_edge(clique[i], clique[j]):
+                    ax.plot([pos[clique[i]][0], pos[clique[j]][0]],
+                            [pos[clique[i]][1], pos[clique[j]][1]],
+                            color=clique_color, linewidth=2, alpha=0.6)
+
+    # Draw the rest of the graph, possibly adjusting parameters for visibility
+    nx.draw(G, pos, ax=ax, node_color='black', edge_color='gray', node_size=20, alpha=1)
+
+
 
     # Draw movement lines
     for i in pos.keys():

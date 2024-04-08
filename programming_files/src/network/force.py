@@ -59,18 +59,23 @@ def update_positions(pos, displacement, cooling_factor=0.1):
 
 
 
+import matplotlib.pyplot as plt
+import networkx as nx
+
 def simulate(G, iterations=50, plot_every_n_steps=10, cooling_factor=0.95):
-    pos = initialize_positions(G)
+    pos = initialize_positions(G)  # Ensure this function is defined or imported
     old_pos = pos.copy()
     fig, ax = plt.subplots(figsize=(8, 8))
 
     for iteration in range(iterations):
-        displacement, force_vectors = apply_forces(G, pos)
-        pos = update_positions(pos, displacement, cooling_factor)
+        displacement, force_vectors = apply_forces(G, pos)  # Ensure this function is defined or imported
+        pos = update_positions(pos, displacement, cooling_factor)  # Ensure this function is defined or imported
         cooling_factor *= 0.95
 
         if iteration % plot_every_n_steps == 0 or iteration == iterations - 1:
-            plot_graph(G, pos, old_pos, force_vectors, ax)
+            # Calculate cliques only when needed for plotting
+            cliques = list(nx.find_cliques(G))
+            plot_graph(G, pos, old_pos, force_vectors, cliques, ax)  # Adjusted to include 'cliques'
             ax.set_title(f"Iteration: {iteration}")
             plt.pause(0.1)  # Pause to observe each step
             old_pos = pos.copy()
