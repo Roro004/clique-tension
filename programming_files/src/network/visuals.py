@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import networkx as nx
+import numpy as np
 from network.identify import find_max_cliques
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -20,11 +21,12 @@ def plot_graph(G, pos, old_pos, force_vectors, cliques, ax):
         clique_centroids[idx] = centroid
 
         # Draw a red circle at the centroid
-        circle = Circle(centroid, 0.05, color='red', fill=True, alpha=0.6)  # Adjust size and alpha as needed
+        circle = Circle(centroid, 0.1, color='red', fill=True, alpha=0.8)  # Increased size and opacity
         ax.add_patch(circle)
 
     colormap = plt.cm.get_cmap('Pastel2_r', len(cliques))
 
+    # Increase linewidth for better visibility
     for idx, clique in enumerate(cliques):
         clique_color = colormap(idx / len(cliques))
 
@@ -33,17 +35,36 @@ def plot_graph(G, pos, old_pos, force_vectors, cliques, ax):
                 if G.has_edge(clique[i], clique[j]):
                     ax.plot([pos[clique[i]][0], pos[clique[j]][0]],
                             [pos[clique[i]][1], pos[clique[j]][1]],
-                            color=clique_color, linewidth=2, alpha=0.6)
+                            color=clique_color, linewidth=3, alpha=0.7)
 
         centroid = clique_centroids[idx]
         for node in non_clique_nodes:
             for clique_member in clique:
                 if G.has_edge(node, clique_member):
                     ax.plot([pos[node][0], centroid[0]], [pos[node][1], centroid[1]],
-                            color='grey', linestyle='--', linewidth=1, alpha=0.6)
+                            color='grey', linestyle='--', linewidth=2, alpha=0.8)
                     break
 
-    nx.draw(G, pos, ax=ax, node_color='black', edge_color='gray', node_size=20, alpha=1)
+    # Draw nodes and edges with larger size for clarity
+    nx.draw(G, pos, ax=ax, node_color='black', edge_color='gray', node_size=50, alpha=1)
+
+    # Draw movement lines with increased visibility
+    for i in pos.keys():
+        if i in old_pos:
+            ax.plot([old_pos[i][0], pos[i][0]], [old_pos[i][1], pos[i][1]], color='grey', linestyle='-', linewidth=2, alpha=0.7)
+
+    # Enhance the visibility of force vectors
+    for i, vectors in force_vectors['repulsive'].items():
+        for j, vector in vectors:
+            ax.quiver(pos[i][0], pos[i][1], vector[0], vector[1], angles='xy', scale_units='xy', scale=1, color='red', width=0.005, alpha=0.7)
+
+    for (i, j), vector in force_vectors['attractive'].items():
+        ax.quiver(pos[i][0], pos[i][1], vector[0], vector[1], angles='xy', scale_units='xy', scale=1, color='blue', width=0.005, alpha=0.7)
+
+    # Set limits to ensure all elements are within view
+    ax.set_xlim(1.1 * np.min([pos[node][0] for node in G.nodes()]), 1.1 * np.max([pos[node][0] for node in G.nodes()]))
+    ax.set_ylim(1.1 * np.min([pos[node][1] for node in G.nodes()]), 1.1 * np.max([pos[node][1] for node in G.nodes()]))
+    ax.set_aspect('equal', adjustable='box')
 
 
 

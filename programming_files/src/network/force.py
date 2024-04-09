@@ -1,54 +1,51 @@
 import numpy as np
-from network.visuals import plot_graph
 import matplotlib.pyplot as plt
-from network.identify import map_nodes_to_cliques
+import networkx as nx
+from matplotlib.patches import Circle
 
+# Assume these functions are defined elsewhere in your module
+from network.identify import map_nodes_to_cliques, find_max_cliques
+from network.visuals import plot_graph
 
 def initialize_positions(G):
+    """Initialize node positions randomly."""
     return {i: np.random.rand(2) for i in G.nodes()}
 
-
-
-def apply_forces(G, pos, repulsion=4000, attraction=0.1, max_displacement=10, acceleration_factor=1.2):
+def apply_forces(G, pos, repulsion=4000, attraction=0.1, attraction_factor=0.5, repulsion_factor=5000, max_displacement=10):
+    """Apply forces based on current positions, returning displacement and force vectors."""
     displacement = {i: np.zeros(2) for i in G.nodes()}
     force_vectors = {'attractive': {}, 'repulsive': {}}
-    repulse_count = {i: 0 for i in G.nodes()}  # Count of repulsive forces for each node
+    cliques = find_max_cliques(G)
 
-    # Apply repulsive forces
-    for i in G.nodes():
-        for j in G.nodes():
+    clique_centroids = {}
+    for idx, clique in enumerate(cliques):
+        x_coords = [pos[node][0] for node in clique]
+        y_coords = [pos[node][1] for node in clique]
+        centroid = (sum(x_coords) / len(clique), sum(y_coords) / len(clique))
+        clique_centroids[idx] = centroid
+
+    # Apply attractive force towards their own centroid for each node in a clique
+    for idx, clique in enumerate(cliques):
+        centroid = clique_centroids[idx]
+        for node in clique:
+            vector_to_centroid = np.array(centroid) - np.array(pos[node])
+            displacement[node] += vector_to_centroid * attraction_factor
+
+    # Apply repulsion from other clique centroids
+    for i, centroid_i in clique_centroids.items():
+        for j, centroid_j in clique_centroids.items():
             if i != j:
-                delta = pos[i] - pos[j]
-                distance = np.linalg.norm(delta) + 0.01
-                force_magnitude = min(repulsion / distance**2, max_displacement)
-                force_vector = delta / distance * force_magnitude
-                displacement[i] += force_vector
-                if i not in force_vectors['repulsive']:
-                    force_vectors['repulsive'][i] = []
-                force_vectors['repulsive'][i].append((j, force_vector))
+                vector_between_centroids = np.array(centroid_i) - np.array(centroid_j)
+                distance = np.linalg.norm(vector_between_centroids)
+                if distance > 0:  # Avoid division by zero
+                    repulsion_force = vector_between_centroids / (distance ** 2) * repulsion_factor
+                    for node in cliques[i]:
+                        displacement[node] -= repulsion_force
 
-    # Apply attractive forces
-    for i, j in G.edges():
-        delta = pos[i] - pos[j]
-        distance = np.linalg.norm(delta)
-        force_magnitude = min(distance**2 / attraction, max_displacement)
-        direction = delta / distance
-        force_vector = direction * force_magnitude
-        displacement[i] -= force_vector
-        displacement[j] += force_vector
-        force_vectors['attractive'][(i, j)] = force_vector
-
-    for i in repulse_count:
-        if repulse_count[i] > 2:
-        # Only proceed if attractive forces exist
-            for _, vector in force_vectors['attractive'].get((i, i), []):
-            # Apply acceleration in the opposite direction only if nodes are in different cliques
-                for j in repulse_count:
-                    if j != i and map_nodes_to_cliques.get(i) != map_nodes_to_cliques.get(j):
-                        displacement[i] -= vector * acceleration_factor
     return displacement, force_vectors
 
 def update_positions(pos, displacement, cooling_factor=0.1):
+    """Update positions based on displacement and cooling factor."""
     new_pos = {}
     for i in pos.keys():
         new_position = pos[i] + displacement[i] * cooling_factor
@@ -57,27 +54,39 @@ def update_positions(pos, displacement, cooling_factor=0.1):
         new_pos[i] = new_position
     return new_pos
 
+def plot_graph(G, pos, cliques, ax):
+    """Plot the graph, highlighting cliques and centroids."""
+    ax.clear()
+    nx.draw(G, pos, ax=ax, node_color='black', edge_color='gray', node_size=20, alpha=1)
 
-
-import matplotlib.pyplot as plt
-import networkx as nx
+    # Calculate and draw centroids for cliques
+    for idx, clique in enumerate(cliques):
+        x_coords = [pos[node][0] for node in clique]
+        y_coords = [pos[node][1] for node in clique]
+        centroid = (sum(x_coords) / len(clique), sum(y_coords) / len(clique))
+        circle = Circle(centroid, 0.05, color='red', fill=True, alpha=0.6)
+        ax.add_patch(circle)
 
 def simulate(G, iterations=50, plot_every_n_steps=10, cooling_factor=0.95):
-    pos = initialize_positions(G)  # Ensure this function is defined or imported
+    """Run the simulation for a given graph G."""
+    pos = initialize_positions(G)
     old_pos = pos.copy()
     fig, ax = plt.subplots(figsize=(8, 8))
 
     for iteration in range(iterations):
-        displacement, force_vectors = apply_forces(G, pos)  # Ensure this function is defined or imported
-        pos = update_positions(pos, displacement, cooling_factor)  # Ensure this function is defined or imported
+        displacement, force_vectors = apply_forces(G, pos)
+        pos = update_positions(pos, displacement, cooling_factor)
         cooling_factor *= 0.95
 
         if iteration % plot_every_n_steps == 0 or iteration == iterations - 1:
-            # Calculate cliques only when needed for plotting
             cliques = list(nx.find_cliques(G))
-            plot_graph(G, pos, old_pos, force_vectors, cliques, ax)  # Adjusted to include 'cliques'
+            plot_graph(G, pos, cliques, ax)
             ax.set_title(f"Iteration: {iteration}")
             plt.pause(0.1)  # Pause to observe each step
             old_pos = pos.copy()
 
     plt.show()
+
+# Example usage:
+# G = nx.karate_club_graph()  # Or any Graph you're working with
+# simulate(G)
