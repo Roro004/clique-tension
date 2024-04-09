@@ -43,14 +43,6 @@ def apply_forces(G, pos, repulsion=4000, attraction=0.1, max_displacement=10, ac
     cliques = map_nodes_to_cliques(G)
     num_cliques = len(cliques)
 
-    # for i in repulse_count:
-    #     if repulse_count[i] > 2:
-    #     # Only proceed if attractive forces exist
-    #         for _, vector in force_vectors['attractive'].get((i, i), []):
-    #         # Apply acceleration in the opposite direction only if nodes are in different cliques
-    #             for j in repulse_count:
-    #                 if j != i and map_nodes_to_cliques.get(i) != map_nodes_to_cliques.get(j):
-    #                     displacement[i] -= vector * acceleration_factor
 
 
 
@@ -58,31 +50,31 @@ def apply_forces(G, pos, repulsion=4000, attraction=0.1, max_displacement=10, ac
 
     # Assuming the desired range for x positions is between 0 and 1
     # Calculate equidistant x positions for each clique
-    # x_positions = {clique: (index + 1) / (num_cliques + 1) for index, clique in enumerate(cliques)}
+    x_positions = {clique: (index + 1) / (num_cliques + 1) for index, clique in enumerate(cliques)}
 
-    # for i in repulse_count:
-    #     if repulse_count[i] > 2:
-    #         # Attract nodes to their clique's x-axis position
-    #         clique_of_i = map_nodes_to_cliques.get(i)
-    #         if clique_of_i is not None:
-    #             target_x_position = x_positions[clique_of_i]
+    for i in repulse_count:
+        if repulse_count[i] > 2:
+            # Attract nodes to their clique's x-axis position
+            clique_of_i = map_nodes_to_cliques.get(i)
+            if clique_of_i is not None:
+                target_x_position = x_positions[clique_of_i]
 
-    #             # Assuming 'displacement' is a dict with node keys and (x, y) tuple values
-    #             current_x, current_y = displacement[i]
+                # Assuming 'displacement' is a dict with node keys and (x, y) tuple values
+                current_x, current_y = displacement[i]
 
-    #             # Calculate the x-axis displacement needed to move towards the target x position
-    #             # Adjust this calculation based on your specific needs (e.g., current position, fixed acceleration factor)
-    #             x_displacement = (target_x_position - current_x) * acceleration_factor
+                # Calculate the x-axis displacement needed to move towards the target x position
+                # Adjust this calculation based on your specific needs (e.g., current position, fixed acceleration factor)
+                x_displacement = (target_x_position - current_x) * acceleration_factor
 
-    #             # Update the displacement with the new x value, leaving y as it is
-    #             displacement[i] = (current_x + x_displacement, current_y)
+                # Update the displacement with the new x value, leaving y as it is
+                displacement[i] = (current_x + x_displacement, current_y)
 
-    #             # If there are attractive forces, apply them as well
-    #             for _, vector in force_vectors['attractive'].get((i, i), []):
-    #                 for j in repulse_count:
-    #                     if j != i and map_nodes_to_cliques.get(i) != map_nodes_to_cliques.get(j):
-    #                         # Modify the x component of the vector only, as y is not fixed
-    #                         displacement[i] = (displacement[i][0] - vector[0] * acceleration_factor, displacement[i][1])
+                # If there are attractive forces, apply them as well
+                for _, vector in force_vectors['attractive'].get((i, i), []):
+                    for j in repulse_count:
+                        if j != i and map_nodes_to_cliques.get(i) != map_nodes_to_cliques.get(j):
+                            # Modify the x component of the vector only, as y is not fixed
+                            displacement[i] = (displacement[i][0] - vector[0] * acceleration_factor, displacement[i][1])
 
 
 

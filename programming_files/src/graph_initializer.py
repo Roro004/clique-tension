@@ -3,7 +3,7 @@ import networkx as nx
 def create_graph():
     # 1: Karate
     G = nx.karate_club_graph()
-    # G = nx.caveman_graph(5,7)
+    # G = nx.caveman_graph(6,7)
     # G = nx.Graph()
     # # 2: 89 nodes
     # file_path = 'programming_files/src/data/email_eu_3_89'
