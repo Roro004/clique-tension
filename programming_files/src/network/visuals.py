@@ -96,8 +96,48 @@ def plot_graph(G, pos, old_pos, force_vectors, cliques, ax):
 
 
 
+# identifies clique edges and colours correctily
+# def plot_graph(G, pos, old_pos, force_vectors, cliques, ax):
+#     ax.clear()
 
+#     all_clique_nodes = set(node for clique in cliques for node in clique)
+#     all_nodes = set(G.nodes())
+#     non_clique_nodes = all_nodes - all_clique_nodes
 
+#     clique_centroids = {}
+#     for idx, clique in enumerate(cliques):
+#         x_coords = [pos[node][0] for node in clique]
+#         y_coords = [pos[node][1] for node in clique]
+#         centroid = (sum(x_coords) / len(clique), sum(y_coords) / len(clique))
+#         clique_centroids[idx] = centroid
+
+#         # Draw a red circle at the centroid
+#         circle = Circle(centroid, 0.05, color='red', fill=True, alpha=0.6)  # Adjust size and alpha as needed
+#         ax.add_patch(circle)
+
+#     colormap = plt.cm.get_cmap('Pastel2_r', len(cliques))
+
+#     for idx, clique in enumerate(cliques):
+#         clique_color = colormap(idx / len(cliques))
+
+#         for i in range(len(clique)):
+#             for j in range(i + 1, len(clique)):
+#                 if G.has_edge(clique[i], clique[j]):
+#                     ax.plot([pos[clique[i]][0], pos[clique[j]][0]],
+#                             [pos[clique[i]][1], pos[clique[j]][1]],
+#                             color=clique_color, linewidth=2, alpha=0.6)
+
+#         centroid = clique_centroids[idx]
+#         for node in non_clique_nodes:
+#             for clique_member in clique:
+#                 if G.has_edge(node, clique_member):
+#                     ax.plot([pos[node][0], centroid[0]], [pos[node][1], centroid[1]],
+#                             color='grey', linestyle='--', linewidth=1, alpha=0.6)
+#                     break
+
+#     nx.draw(G, pos, ax=ax, node_color='black', edge_color='gray', node_size=20, alpha=1)
+
+    # Add movement and force vectors as previously defined...
 
 
 
