@@ -3,7 +3,7 @@ import networkx as nx
 def create_graph():
     # 1: Karate
     G = nx.karate_club_graph()
-
+    G = nx.powerlaw_cluster_graph(20,2,.04)
     # G = nx.Graph()
     # # 2: 89 nodes
     # file_path = 'programming_files/src/data/email_eu_3_89'
