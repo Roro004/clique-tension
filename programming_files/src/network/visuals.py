@@ -8,53 +8,44 @@ from matplotlib.patches import Circle
 def plot_graph(G, pos, old_pos, force_vectors, cliques, ax):
     ax.clear()
 
-    # Calculate centroids of cliques
+    all_clique_nodes = set(node for clique in cliques for node in clique)
+    all_nodes = set(G.nodes())
+    non_clique_nodes = all_nodes - all_clique_nodes
+
     clique_centroids = {}
     for idx, clique in enumerate(cliques):
         x_coords = [pos[node][0] for node in clique]
         y_coords = [pos[node][1] for node in clique]
-        centroid = (sum(x_coords) / len(x_coords), sum(y_coords) / len(y_coords))
+        centroid = (sum(x_coords) / len(clique), sum(y_coords) / len(clique))
         clique_centroids[idx] = centroid
-        # Optional: Draw a red circle at each centroid for visual reference
-        circle = Circle(centroid, .5, color='red', fill=True, alpha=0.6)
+
+        # Draw a red circle at the centroid
+        circle = Circle(centroid, 0.05, color='red', fill=True, alpha=0.6)  # Adjust size and alpha as needed
         ax.add_patch(circle)
 
-    # Prepare a mapping from node to its clique index and centroid
-    node_to_clique_info = {}
+    colormap = plt.cm.get_cmap('Pastel2_r', len(cliques))
+
     for idx, clique in enumerate(cliques):
-        for node in clique:
-            node_to_clique_info[node] = (idx, clique_centroids[idx])
+        clique_color = colormap(idx / len(cliques))
 
-    # Draw edges based on the type
-    colormap = plt.cm.get_cmap('Pastel1', len(cliques))
-    for node1, node2 in G.edges():
-        # Determine the type of edge
-        if node1 in node_to_clique_info and node2 in node_to_clique_info:
-            clique1, centroid1 = node_to_clique_info[node1]
-            clique2, centroid2 = node_to_clique_info[node2]
+        for i in range(len(clique)):
+            for j in range(i + 1, len(clique)):
+                if G.has_edge(clique[i], clique[j]):
+                    ax.plot([pos[clique[i]][0], pos[clique[j]][0]],
+                            [pos[clique[i]][1], pos[clique[j]][1]],
+                            color=clique_color, linewidth=2, alpha=0.6)
 
-            if clique1 == clique2:  # Same clique
-                ax.plot([pos[node1][0], pos[node2][0]], [pos[node1][1], pos[node2][1]],
-                        color=colormap(clique1), linewidth=2, alpha=1)
-            else:  # Different cliques
-                ax.plot([centroid1[0], centroid2[0]], [centroid1[1], centroid2[1]],
-                        color='grey', linestyle='--', linewidth=1, alpha=0.6)
-        else:
-            # Edge from a node to a clique centroid
-            if node1 in node_to_clique_info:
-                centroid = node_to_clique_info[node1][1]
-                ax.plot([pos[node2][0], centroid[0]], [pos[node2][1], centroid[1]],
-                        color='grey', linewidth=1, alpha=0.3)
-            if node2 in node_to_clique_info:
-                centroid = node_to_clique_info[node2][1]
-                ax.plot([pos[node1][0], centroid[0]], [pos[node1][1], centroid[1]],
-                        color='grey', linewidth=1, alpha=0.3)
+        centroid = clique_centroids[idx]
+        for node in non_clique_nodes:
+            for clique_member in clique:
+                if G.has_edge(node, clique_member):
+                    ax.plot([pos[node][0], centroid[0]], [pos[node][1], centroid[1]],
+                            color='grey', linestyle='--', linewidth=1, alpha=0.6)
+                    break
 
-    # Draw nodes
     nx.draw(G, pos, ax=ax, node_color='black', edge_color='gray', node_size=20, alpha=1)
-    # Add move
-    # Movement and force vectors as before...
 
+    # Add movement and force vectors as previously defined...
 
 
 # def plot_graph(G, pos, old_pos, force_vectors, cliques, ax):
