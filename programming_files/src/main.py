@@ -1,4 +1,5 @@
 from graph_initializer import create_graph
+import networkx as nx
 
 # Import functionalities from the network package
 from network import apply_forces, update_positions, initialize_positions, print_node_clique_membership_from_selected, plot_graph, find_max_cliques, simulate
@@ -13,3 +14,4 @@ pos = update_positions(pos, displacement)
 selected_cliques = find_max_cliques(G)
 print_node_clique_membership_from_selected(G, selected_cliques)
 simulate(G, iterations=1000)
+print(nx.info(G))

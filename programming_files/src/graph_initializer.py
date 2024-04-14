@@ -7,8 +7,8 @@ def create_graph():
     p_positive = 1
     G = nx.complete_graph(3)
     for (u, v) in G.edges():
-        G[u][v]['weight'] = 1 
-        return G
+        G[u][v]['weight'] = -1
+    return G
 
     # G = nx.Graph()
     # # 2: 89 nodes
