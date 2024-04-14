@@ -1,10 +1,18 @@
 import matplotlib.pyplot as plt
 import networkx as nx
+from graph_initializer import create_graph ,positive_edges, negative_edges
 
 def plot_graph(G, pos, old_pos, force_vectors, ax):
     ax.clear()
-    nx.draw(G, pos, ax=ax, node_color='skyblue', edge_color='gray', node_size=50)
+    nx.draw(G, pos, ax=ax, node_color='black', node_size=50)
 
+
+    # Drawing nodes
+    nx.draw_networkx_nodes(G, pos, node_size=50)
+
+    # Drawing edges
+    nx.draw_networkx_edges(G, pos, edgelist=positive_edges(G), width=2, alpha=0.5, edge_color='green')
+    nx.draw_networkx_edges(G, pos, edgelist=negative_edges(G), width=2, alpha=0.5, edge_color='red')
     # Draw movement lines
     for i in pos.keys():
         if i in old_pos:

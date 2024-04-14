@@ -2,7 +2,7 @@ import numpy as np
 from network.visuals import plot_graph
 import matplotlib.pyplot as plt
 from network.identify import map_nodes_to_cliques
-
+from graph_initializer import positive_edges, negative_edges
 
 def initialize_positions(G):
     return {i: np.random.rand(2) for i in G.nodes()}
@@ -39,24 +39,38 @@ def apply_forces(G, pos, repulsion=4000, attraction=0.1, max_displacement=10, ac
         force_vectors['attractive'][(i, j)] = force_vector
 
     for i in repulse_count:
-        if repulse_count[i] > 2:
-        # Only proceed if attractive forces exist
-            for _, vector in force_vectors['attractive'].get((i, i), []):
-            # Apply acceleration in the opposite direction only if nodes are in different cliques
-                for j in repulse_count:
-                    if j != i and map_nodes_to_cliques.get(i) != map_nodes_to_cliques.get(j):
-                        displacement[i] -= vector * acceleration_factor
-    return displacement, force_vectors
+        if repulse_count[i] > 2:  # Check if node i has more than 2 repulsive forces
+            # Iterate over attractive forces, if they exist
+            for j in G.nodes():
+                if i != j and (i, j) in G.edges():
+                    if (i, j) in positive_edges(G):  # Attract if positive edge
+                        vector = force_vectors.get('attractive', {}).get((i, j), None)
+                        if vector and map_nodes_to_cliques.get(i) != map_nodes_to_cliques.get(j):
+                            displacement[i] += vector * acceleration_factor  # Attract towards node j
+                    elif (i, j) in negative_edges(G):  # Repel if negative edge
+                        vector = force_vectors.get('repulsive', {}).get((i, j), None)
+                        if vector and map_nodes_to_cliques.get(i) != map_nodes_to_cliques.get(j):
+                            displacement[i] -= vector * acceleration_factor  # Repel away from node j
+        return displacement, force_vectors
 
 def update_positions(pos, displacement, cooling_factor=0.1):
     new_pos = {}
     for i in pos.keys():
         new_position = pos[i] + displacement[i] * cooling_factor
+
+
+        # Ensure that the new position is finite, otherwise reset randomly
         if not np.all(np.isfinite(new_position)):
             new_position = np.random.rand(2)
         new_pos[i] = new_position
     return new_pos
 
+def update_edge_weights(G, weight_increment=1):
+    for u, v, d in G.edges(data=True):
+        if d.get('weight', 0) > 0:
+            d['weight'] += weight_increment  # Increase weight for positive edges
+        elif d.get('weight', 0) < 0:
+            d['weight'] -= weight_increment  # Increase weight for negative edges (make more negative)
 
 
 def simulate(G, iterations=50, plot_every_n_steps=10, cooling_factor=0.95):
@@ -67,12 +81,15 @@ def simulate(G, iterations=50, plot_every_n_steps=10, cooling_factor=0.95):
     for iteration in range(iterations):
         displacement, force_vectors = apply_forces(G, pos)
         pos = update_positions(pos, displacement, cooling_factor)
-        cooling_factor *= 0.95
+        update_edge_weights(G)  # Update weights after forces are applied each iteration
+        # cooling_factor *= 0.95
 
         if iteration % plot_every_n_steps == 0 or iteration == iterations - 1:
             plot_graph(G, pos, old_pos, force_vectors, ax)
             ax.set_title(f"Iteration: {iteration}")
             plt.pause(0.1)  # Pause to observe each step
             old_pos = pos.copy()
+
+    plt.show()
 
     plt.show()

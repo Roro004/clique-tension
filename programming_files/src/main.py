@@ -12,4 +12,4 @@ pos = update_positions(pos, displacement)
 # Identify and visualize cliques
 selected_cliques = find_max_cliques(G)
 print_node_clique_membership_from_selected(G, selected_cliques)
-simulate(G, iterations=100, plot_every_n_steps=5)
+simulate(G, iterations=1000)

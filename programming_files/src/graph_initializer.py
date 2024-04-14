@@ -1,8 +1,14 @@
 import networkx as nx
+import random
+p_positive = 0.5
 
 def create_graph():
     # 1: Karate
-    G = nx.karate_club_graph()
+    p_positive = 1
+    G = nx.complete_graph(3)
+    for (u, v) in G.edges():
+        G[u][v]['weight'] = 1 
+        return G
 
     # G = nx.Graph()
     # # 2: 89 nodes
@@ -52,3 +58,8 @@ def create_graph():
 
     print(G)
     return G
+def positive_edges(G):
+    return [(u, v) for u, v, d in G.edges(data=True) if d.get('weight', 0) > 0]
+
+def negative_edges(G):
+    return [(u, v) for u, v, d in G.edges(data=True) if d.get('weight', 0) < 0]
