@@ -1,13 +1,16 @@
 import networkx as nx
 import random
+
 p_positive = 0.5
 
 def create_graph():
     # 1: Karate
+    rand_value = random.random()
     p_positive = 1
     G = nx.karate_club_graph()
     for (u, v) in G.edges():
-        G[u][v]['weight'] = -1
+        G[u][v]['weight'] = 1 if rand_value < p_positive else -1
+
     return G
 
     # G = nx.Graph()

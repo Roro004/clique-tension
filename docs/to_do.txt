@@ -2,12 +2,19 @@ To do
 ---
 Tecnicial
 convery the foce model to a dygraph
-be able to randomly add signage
-be able to randomly add weignt
-
-
+be able to randomly add signage , 1, -1, 0
 Threshold based on signage, overall dyad strength aggegration
 from dyad to maximal clique
+
+network flow? cutting along 2 - edges
+
+---
+add structural balence score, add updating balence
+add plot and spectral embedding to bias force
+
+
+
+
 
 Model
 variables
