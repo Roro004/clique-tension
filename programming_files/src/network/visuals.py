@@ -39,3 +39,52 @@ def plot_graph(G, pos, old_pos, force_vectors, ax):
 
     for (i, j), vector in force_vectors['attractive'].items():
         ax.quiver(pos[i][0], pos[i][1], vector[0], vector[1], angles='xy', scale_units='xy', scale=1, color='blue', width=0.002, alpha=0.5)
+
+
+
+
+
+
+def plot_graph(G, pos, old_pos, force_vectors, cliques, ax):
+    ax.clear()
+
+    # Create a dictionary to map each node to its clique's centroid
+    node_to_centroid = {}
+    for idx, clique in enumerate(cliques):
+        # Calculate centroid for this clique
+        x_coords = [pos[node][0] for node in clique]
+        y_coords = [pos[node][1] for node in clique]
+        centroid = (sum(x_coords) / len(clique), sum(y_coords) / len(clique))
+
+        # Draw red circle at centroid
+        circle = Circle(centroid, 0.5, color='red', fill=True, alpha=0.6)
+        ax.add_patch(circle)
+
+        # Map each node in the clique to this centroid
+        for node in clique:
+            node_to_centroid[node] = centroid
+
+    # Draw edges
+    for node1, node2 in G.edges():
+        # Both nodes in cliques and mapped to the same centroid (within same clique)
+        if node1 in node_to_centroid and node2 in node_to_centroid and node_to_centroid[node1] == node_to_centroid[node2]:
+            ax.plot([pos[node1][0], pos[node2][0]],
+                    [pos[node1][1], pos[node2][1]],
+                    color='blue', linewidth=2, alpha=0.6)
+        else:
+            # At least one node not in any clique or in different cliques
+            centroid1 = node_to_centroid.get(node1, pos[node1])
+            centroid2 = node_to_centroid.get(node2, pos[node2])
+            ax.plot([centroid1[0], centroid2[0]],
+                    [centroid1[1], centroid2[1]],
+                    color='grey', linestyle='--', linewidth=1, alpha=0.6)
+
+    # Draw nodes
+    nx.draw(G, pos, ax=ax, node_color='black', edge_color='gray', node_size=20, alpha=1)
+
+
+
+
+
+
+
