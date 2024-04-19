@@ -2,9 +2,27 @@ To do
 ---
 Tecnicial
 convery the foce model to a dygraph
+be able to randomly add signage
+be able to randomly add weignt
+
+
+Threshold based on signage, overall dyad strength aggegration
+from dyad to maximal clique
+
+Model
+variables
+- edge density and pattern
+- size of network
+- type of network
+- signage disterbutions +1, -1, 0
+
+
+
+
+xx
 allow the addition of weight to edges to represent flow
 field disterbution based on network density and signage
-
+xx
 ----
 Threshold
 Threshold based on symetry
@@ -24,8 +42,9 @@ Model
 variables
 - edge density and pattern
 - size of network
-- signage disterbutions
-- weight disterbutions
+- type of network
+- signage disterbutions +1, -1, 0
+
 
 
 identify
