@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import networkx as nx
 from graph_initializer import create_graph ,positive_edges, negative_edges
+from identify import find_max_cliques
 
 def plot_graph(G, pos, old_pos, force_vectors, ax):
     ax.clear()
@@ -8,7 +9,20 @@ def plot_graph(G, pos, old_pos, force_vectors, ax):
 
 
     # Drawing nodes
-    nx.draw_networkx_nodes(G, pos, node_size=50)
+    # nx.draw_networkx_nodes(G, pos, node_size=50)
+
+    colormap = plt.cm.get_cmap('Pastel2_r', len(cliques))
+
+    # Create a color map for nodes based on their clique membership
+    node_color = {}
+    for idx, clique in enumerate(cliques):
+        clique_color = colormap(idx / len(cliques))  # Normalize idx to the range [0, 1]
+        for node in clique:
+            node_color[node] = clique_color
+
+    # Now draw the graph with these node colors
+    nx.draw(G, pos, node_color=[node_color[node] for node in G.nodes()], with_labels=True)
+
 
     # Drawing edges
     nx.draw_networkx_edges(G, pos, edgelist=positive_edges(G), width=2, alpha=0.5, edge_color='green')
