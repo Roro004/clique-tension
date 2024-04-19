@@ -1,0 +1,40 @@
+To do
+---
+Tecnicial
+convery the foce model to a dygraph
+allow the addition of weight to edges to represent flow
+field disterbution based on network density and signage
+
+----
+Threshold
+Threshold based on symetry
+Threshold based on signage
+threshold models for dyad
+
+dyad expansion - maxiaml cliques, further
+different clustering based on signage
+
+--
+Visuval
+Add visuval to main model
+Colour edges and nodes accoding to clusters - - Draw a clique as a cluster
+
+
+Model
+variables
+- edge density and pattern
+- size of network
+- signage disterbutions
+- weight disterbutions
+
+
+identify
+- strength of each edge
+-
+
+visuval
+- field distabution based on signage
+-
+
+force
+- edges with less force end up closer togeather
