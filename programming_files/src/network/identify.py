@@ -84,7 +84,7 @@ def find_max_cliques(G):
 #             connections_to_clique = sum(1 for neighbor in neighbors_of_node if neighbor in expanded_clique)
 
 #             # If more than 2/3 of 'node's neighbors are in the clique, add 'node' to the clique
-#             if connections_to_clique > (5/5) * len(neighbors_of_node):
+#             if connections_to_clique > (3/5) * len(neighbors_of_node):
 #                 expanded_clique.append(node)
 
 #         expanded_cliques.append(expanded_clique)
