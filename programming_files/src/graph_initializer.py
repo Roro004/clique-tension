@@ -5,7 +5,7 @@ p_positive = 0.5
 def create_graph():
     # 1: Karate
     p_positive = 1
-    G = nx.complete_graph(3)
+    G = nx.karate_club_graph()
     for (u, v) in G.edges():
         G[u][v]['weight'] = -1
     return G
