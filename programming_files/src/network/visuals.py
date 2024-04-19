@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import networkx as nx
 from graph_initializer import create_graph ,positive_edges, negative_edges
 from network.identify import find_max_cliques, map_nodes_to_cliques
+from matplotlib.patches import Circle
 
 def plot_graph(G, pos, old_pos, force_vectors, ax):
     ax.clear()
