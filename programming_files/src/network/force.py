@@ -53,6 +53,47 @@ def apply_forces(G, pos, repulsion=4000, attraction=0.1, max_displacement=10, ac
                             displacement[i] -= vector * acceleration_factor  # Repel away from node j
         return displacement, force_vectors
 
+
+# ----
+
+    # clique_centroids = {}
+    # for idx, clique in enumerate(cliques):
+    #     x_coords = [pos[node][0] for node in clique]
+    #     y_coords = [pos[node][1] for node in clique]
+    #     centroid = (sum(x_coords) / len(clique), sum(y_coords) / len(clique))
+    #     clique_centroids[idx] = centroid
+
+    # # Apply attractive force towards their own centroid for each node in a clique
+    # for idx, clique in enumerate(cliques):
+    #     centroid = clique_centroids[idx]
+    #     for node in clique:
+    #         vector_to_centroid = np.array(centroid) - np.array(pos[node])
+    #         displacement[node] += vector_to_centroid * attraction_factor
+
+    # # Apply repulsion from other clique centroids
+    # for i, centroid_i in clique_centroids.items():
+    #     for j, centroid_j in clique_centroids.items():
+    #         if i != j:
+    #             vector_between_centroids = np.array(centroid_i) - np.array(centroid_j)
+    #             distance = np.linalg.norm(vector_between_centroids)
+    #             if distance > 0:  # Avoid division by zero
+    #                 repulsion_force = vector_between_centroids / (distance ** 2) * repulsion_factor
+    #                 for node in cliques[i]:
+    #                     displacement[node] -= repulsion_force
+
+    # return displacement, force_vectors
+
+
+
+
+
+
+
+
+
+
+
+
 def update_positions(pos, displacement, cooling_factor=0.1):
     new_pos = {}
     for i in pos.keys():
