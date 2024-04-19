@@ -17,28 +17,28 @@ import itertools
 #     return selected_cliques
 
 
-def find_max_cliques(G):
-    # This line can be omitted if the layout is not necessary for the algorithm
-    pos = nx.spring_layout(G)
-    cliques = list(nx.find_cliques(G))
-    cliques.sort(key=len, reverse=True)
-    expanded_cliques = []
+# def find_max_cliques(G):
+#     # This line can be omitted if the layout is not necessary for the algorithm
+#     pos = nx.spring_layout(G)
+#     cliques = list(nx.find_cliques(G))
+#     cliques.sort(key=len, reverse=True)
+#     expanded_cliques = []
 
-    for original_clique in cliques:
-        expanded_clique = original_clique.copy()
+#     for original_clique in cliques:
+#         expanded_clique = original_clique.copy()
 
-        # Check each node outside the clique to see if it should be added
-        external_nodes = set(G.nodes()) - set(expanded_clique)
-        for node in external_nodes:
-            connections_to_clique = sum(1 for neighbor in G.neighbors(node) if neighbor in expanded_clique)
-            if connections_to_clique > len(expanded_clique) / 2:
-                expanded_clique.append(node)
+#         # Check each node outside the clique to see if it should be added
+#         external_nodes = set(G.nodes()) - set(expanded_clique)
+#         for node in external_nodes:
+#             connections_to_clique = sum(1 for neighbor in G.neighbors(node) if neighbor in expanded_clique)
+#             if connections_to_clique > len(expanded_clique) / 2:
+#                 expanded_clique.append(node)
 
-        # It's important to sort or otherwise handle the expanded_clique here
-        # if the order or specific arrangement of nodes within it matters later
-        expanded_cliques.append(expanded_clique)
+#         # It's important to sort or otherwise handle the expanded_clique here
+#         # if the order or specific arrangement of nodes within it matters later
+#         expanded_cliques.append(expanded_clique)
 
-    return expanded_cliques
+#     return expanded_cliques
 
 
 
@@ -68,28 +68,28 @@ def find_max_cliques(G):
 #     return expanded_cliques
 
 
-# def find_max_cliques(G):
-#     cliques = list(nx.find_cliques(G))
-#     cliques.sort(key=len, reverse=True)  # Prioritize larger cliques
-#     expanded_cliques = []
+def find_max_cliques(G):
+    cliques = list(nx.find_cliques(G))
+    cliques.sort(key=len, reverse=True)  # Prioritize larger cliques
+    expanded_cliques = []
 
-#     for original_clique in cliques:
-#         expanded_clique = original_clique.copy()
+    for original_clique in cliques:
+        expanded_clique = original_clique.copy()
 
-#         # Check each node not currently in the clique
-#         external_nodes = set(G.nodes()) - set(expanded_clique)
-#         for node in external_nodes:
-#             # Convert neighbors iterator to list to use len()
-#             neighbors_of_node = list(G.neighbors(node))
-#             connections_to_clique = sum(1 for neighbor in neighbors_of_node if neighbor in expanded_clique)
+        # Check each node not currently in the clique
+        external_nodes = set(G.nodes()) - set(expanded_clique)
+        for node in external_nodes:
+            # Convert neighbors iterator to list to use len()
+            neighbors_of_node = list(G.neighbors(node))
+            connections_to_clique = sum(1 for neighbor in neighbors_of_node if neighbor in expanded_clique)
 
-#             # If more than 2/3 of 'node's neighbors are in the clique, add 'node' to the clique
-#             if connections_to_clique > (3/5) * len(neighbors_of_node):
-#                 expanded_clique.append(node)
+            # If more than 2/3 of 'node's neighbors are in the clique, add 'node' to the clique
+            if connections_to_clique > (3/5) * len(neighbors_of_node):
+                expanded_clique.append(node)
 
-#         expanded_cliques.append(expanded_clique)
+        expanded_cliques.append(expanded_clique)
 
-#     return expanded_cliques
+    return expanded_cliques
 
 
 
