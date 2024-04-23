@@ -1,7 +1,7 @@
 import numpy as np
 from network.visuals import plot_graph
 import matplotlib.pyplot as plt
-from network.identify import map_nodes_to_cliques
+# from network.identify import map_nodes_to_cliques
 from graph_initializer import positive_edges, negative_edges
 
 def initialize_positions(G):
@@ -29,14 +29,34 @@ def apply_forces(G, pos, repulsion=4000, attraction=0.1, max_displacement=10, ac
 
     # Apply attractive forces
     for i, j in G.edges():
+        w_a = G[i][j]['weight_a']
+        w_b = G[i][j]['weight_b']
+
         delta = pos[i] - pos[j]
         distance = np.linalg.norm(delta)
         force_magnitude = min(distance**2 / attraction, max_displacement)
         direction = delta / distance
         force_vector = direction * force_magnitude
-        displacement[i] -= force_vector
-        displacement[j] += force_vector
-        force_vectors['attractive'][(i, j)] = force_vector
+
+
+
+        if w_a!=0:
+            displacement[i] -= force_vector * w_a
+            displacement[j] += force_vector * w_a
+
+            if w_a>0:
+                force_vectors['attractive'][(i, j)] = force_vector
+            else:
+                force_vectors['repulsive'][(i, j)] = force_vector
+        if w_b!=0:
+            displacement[i] += force_vector * w_b
+            displacement[j] -= force_vector * w_b
+
+            if w_b>0:
+                force_vectors['attractive'][(j, i)] = force_vector
+            else:
+                force_vectors['repulsive'][(j, i)] = force_vector
+
 
     for i in repulse_count:
         if repulse_count[i] > 2:  # Check if node i has more than 2 repulsive forces
@@ -45,12 +65,10 @@ def apply_forces(G, pos, repulsion=4000, attraction=0.1, max_displacement=10, ac
                 if i != j and (i, j) in G.edges():
                     if (i, j) in positive_edges(G):  # Attract if positive edge
                         vector = force_vectors.get('attractive', {}).get((i, j), None)
-                        if vector and map_nodes_to_cliques.get(i) != map_nodes_to_cliques.get(j):
-                            displacement[i] += vector * acceleration_factor  # Attract towards node j
+                        displacement[i] += vector * acceleration_factor  # Attract towards node j
                     elif (i, j) in negative_edges(G):  # Repel if negative edge
                         vector = force_vectors.get('repulsive', {}).get((i, j), None)
-                        if vector and map_nodes_to_cliques.get(i) != map_nodes_to_cliques.get(j):
-                            displacement[i] -= vector * acceleration_factor  # Repel away from node j
+                        displacement[i] -= vector * acceleration_factor  # Repel away from node j
         return displacement, force_vectors
 
 

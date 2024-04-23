@@ -1,12 +1,23 @@
 To do
 ---
 Tecnicial
-convery the foce model to a dygraph
-be able to randomly add signage , 1, -1, 0
+convery the force model to a dygraph
+make signage influence acceleration
+Add network flow temp as acceleration?
+
+
+Clustering based on signage
+be able to randomly add signage , 1, -1, 0 for non edge
 Threshold based on signage, overall dyad strength aggegration
 from dyad to maximal clique
 
 network flow? cutting along 2 - edges
+
+Threshold
+Threshold based on symetry
+Threshold based on signage
+threshold models for dyad
+
 
 ---
 add structural balence score, add updating balence
