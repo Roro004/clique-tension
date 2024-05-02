@@ -7,7 +7,6 @@ from network import apply_forces, update_positions, initialize_positions,simulat
 
 
 
-
 # Example to initialize and apply forces (you'll need to add your logic for iterating and cooling)
 G = create_graph() # or your custom graph
 

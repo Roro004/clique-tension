@@ -2,6 +2,10 @@ import networkx as nx
 import random
 
 p_positive = 0.5
+n_nodes=3
+density = 0.5
+
+
 
 def create_graph():
 
@@ -10,16 +14,60 @@ def create_graph():
 
 
     # 1: Karate
-    rand_value = random.random()
+
     p_positive = 1
-    G = nx.complete_graph(3)
+    G = nx.complete_graph(n_nodes)
     G = nx.DiGraph(G)
 
-    for (u, v) in G.edges():
-        G[u][v]['weight_a'] = 1 if rand_value < p_positive else -1
-        G[u][v]['weight_b'] = 1 if rand_value < p_positive else -1
+    # for (u, v) in G.edges():
+    #     G[u][v]['weight'] = 1 if random.random() < p_positive else -1
+
+    # all_possible_edges = [(i, j) for i in range(n_nodes) for j in range(n_nodes) if i != j]
+
+    # # Calculate the number of edges based on density
+    # max_edges = n_nodes * (n_nodes - 1)
+    # non_zero_edges_count = int(max_edges * density)
+    # zero_edges_count = max_edges - non_zero_edges_count
+
+    # # Randomly shuffle and assign zero weights to the remaining edges
+    # random.shuffle(all_possible_edges)
+    # zero_edges = all_possible_edges[non_zero_edges_count:]
+    # non_zero_edges = all_possible_edges[:non_zero_edges_count]
+
+    # # Assign zero weights
+    # for u, v in zero_edges:
+    #     G.add_edge(u, v, weight=0)
+
+    # # Determine counts for positive and negative weights within non-zero edges
+    # positive_edges_count = int(non_zero_edges_count * p_positive)
+    # negative_edges_count = non_zero_edges_count - positive_edges_count
+
+    # # Assign weights to the non-zero edges
+    # positive_edges = non_zero_edges[:positive_edges_count]
+    # negative_edges = non_zero_edges[positive_edges_count:]
+
+    # for u, v in positive_edges:
+    #     G.add_edge(u, v, weight=1)
+    # for u, v in negative_edges:
+    #     G.add_edge(u, v, weight=-1)
+
+    # return G
 
 
+
+
+
+
+
+
+    G[0][1]['weight'] = 1
+    G[1][0]['weight'] = -1
+
+    G[1][2]['weight'] = -1
+    G[2][1]['weight'] = 1
+
+    G[2][0]['weight'] = -1
+    G[0][2]['weight'] = -1
 
     return G
 

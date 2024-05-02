@@ -29,16 +29,13 @@ def apply_forces(G, pos, repulsion=4000, attraction=0.1, max_displacement=10, ac
 
     # Apply attractive forces
     for i, j in G.edges():
-        w_a = G[i][j]['weight_a']
-        w_b = G[i][j]['weight_b']
+        w_a = G[i][j]['weight']
 
         delta = pos[i] - pos[j]
         distance = np.linalg.norm(delta)
         force_magnitude = min(distance**2 / attraction, max_displacement)
         direction = delta / distance
         force_vector = direction * force_magnitude
-
-
 
         if w_a!=0:
             displacement[i] -= force_vector * w_a
@@ -48,14 +45,7 @@ def apply_forces(G, pos, repulsion=4000, attraction=0.1, max_displacement=10, ac
                 force_vectors['attractive'][(i, j)] = force_vector
             else:
                 force_vectors['repulsive'][(i, j)] = force_vector
-        if w_b!=0:
-            displacement[i] += force_vector * w_b
-            displacement[j] -= force_vector * w_b
 
-            if w_b>0:
-                force_vectors['attractive'][(j, i)] = force_vector
-            else:
-                force_vectors['repulsive'][(j, i)] = force_vector
 
 
     for i in repulse_count:
